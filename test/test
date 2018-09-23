@@ -28,10 +28,6 @@ function exec_program() {
     ./$PROGRAM_NAME $@ > /dev/null 2>&1
 }
 
-function run_test() {
-    echo $($1)
-}
-
 
 # Setup
 cd $(dirname $0)/..
@@ -43,7 +39,7 @@ gcc_code=$?
 # Run tests
 success_count=0
 for t in $(declare -F | cut -d' ' -f3 | grep -E '^TEST_'); do
-    msg=$(run_test $t)
+    msg=$($t)
     echo $t $msg
     [[ $(echo -n $msg | grep -oE "OK$") == "OK" ]] && success_count=$((success_count+1))
 done
