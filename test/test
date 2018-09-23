@@ -17,8 +17,6 @@
 
 PROGRAM_NAME='main'
 
-alias TESTS_LIST=""
-
 
 function TEST_help() {
     exec_program -h
