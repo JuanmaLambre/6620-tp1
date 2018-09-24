@@ -12,7 +12,7 @@ QS_LOOP:
         addi    sp,sp,4
         sw      t0,0(sp)
         addi    sp,sp,4
-        j       COMP_STR
+        jal     COMP_STR
         blez    v0,QSPB
         sw      cur,0(t3)
         addi    t3,t3,4
@@ -42,5 +42,36 @@ RECURSIVE:
         ... qsort qspt+4 right idem ...
 
 COMP_STR:
-        ... compare two strings ...
+        # Compare two strings (TODO: make it a function)
+        addi    s2,t0,0     # s2: cur pointer
+        addi    s3,t1,0     # s3: pivot pointer
+        lw      s0,0(s2)    # s0: char cur
+        lw      s1,0(s3)    # s1: char pivot
+        bez     s0,ENDZ_CUR
+        bez     s1,ENDZ_PIVOT
+        slt     t6,s0,s1
+        bgtz    t6,END_SMALLER
+        slt     t6,s1,s0
+        bgtz    t6,END_BIGGER
+        addi    s2,s2,1
+        addi    s3,s3,1
+        j       COMP_STR
+
+ENDZ_CUR:
+        bez     s1,END_EQ
+        j       END_BIGGER
+ENDZ_PIVOT:
+        bez     s0,END_EQ
+        j       END_SMALLER
+END_EQ:
+        li      v0,0
+        j       FINISH_COMP
+END_BIGGER:
+        li      v0,-1
+        j       FINISH_COMP
+END_SMALLER:
+        li      v0,1
+FINISH_COMP:
+        jr      ra
+
 
