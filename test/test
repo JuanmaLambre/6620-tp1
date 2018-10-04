@@ -23,6 +23,12 @@ function TEST_help() {
     [[ $? = 0 ]] && echo OK || echo FAILED
 }
 
+function TEST_normal() {
+    ./$PROGRAM_NAME -o - inputs/alice.txt
+    res=$?
+    [[ $res = 0 ]] && echo OK || echo FAILED
+}
+
 
 function exec_program() {
     ./$PROGRAM_NAME $@ > /dev/null 2>&1

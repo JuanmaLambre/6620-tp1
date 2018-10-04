@@ -9,7 +9,26 @@
 
 
 void my_qsort(char** left, char** right, int num) {
-    // There should not be a body for this function
+    int count = (int)(right - left + 1);
+    if (count > 1) {
+        char* pivot = &right;
+        char** cur = left;
+        char** nextMin = left;
+        for (; cur <= right; ++cur) {
+            int cursorSmaller = 0;
+            if (num) cursorSmaller = (atoi(&cur) <= atoi(&pivot));
+            else cursorSmaller = (strcmp(&cur, &pivot) <= 0);
+
+            if (cursorSmaller) {
+                char* aux = &nextMin;
+                nextMin[0] = &cur;
+                cur[0] = aux;
+                nextMin += 1;
+            }
+        }
+        //my_qsort(left, nextMin-1, num);
+        //my_qsort(nextMin, right, num);
+    }
 }
 
 void print_help() {
