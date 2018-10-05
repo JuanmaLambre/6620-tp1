@@ -22,13 +22,13 @@ RUN_VALGRIND=
 
 function TEST_help() {
     exec_program -h
-    [[ $? = 0 ]] && echo OK || echo FAILED
+    [[ $? = 0 ]] && echo OK || echo FAILED $?
 }
 
 function TEST_normal() {
     exec_program -o - $INPUTS_DIR/easy.txt
     res=$?
-    [[ $res = 0 ]] && echo OK || echo FAILED with $res
+    [[ $res = 0 ]] && echo OK || echo FAILED $res
 }
 
 
