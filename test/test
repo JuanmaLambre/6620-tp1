@@ -16,6 +16,8 @@
 # (*) Test cases
 
 PROGRAM_NAME='main'
+INPUTS_DIR='test/inputs'
+RUN_VALGRIND=
 
 
 function TEST_help() {
@@ -24,9 +26,9 @@ function TEST_help() {
 }
 
 function TEST_normal() {
-    ./$PROGRAM_NAME -o - inputs/easy.txt
+    exec_program -o - $INPUTS_DIR/easy.txt
     res=$?
-    [[ $res = 0 ]] && echo OK || echo FAILED
+    [[ $res = 0 ]] && echo OK || echo FAILED with $res
 }
 
 
@@ -55,11 +57,13 @@ count=$(declare -F | cut -d' ' -f3 | grep -E '^TEST_' | wc -l)
 echo Success $((100*success_count/count))'%'
 echo
 
-echo Running with valgrind...
-valgrind ./$PROGRAM_NAME -o /dev/null $(dirname $0)/inputs/text1.txt
-valgrind_code=$?
-if [[ $valgrind_code = 127 ]]; then
-    echo Valgrind not installed
-elif [[ $valgrind_code != 0 ]]; then
-    echo Valgrind FAILED with code $valgrind_code
+if [[ ! -z $RUN_VALGRIND ]]; then
+    echo Running with valgrind...
+    valgrind ./$PROGRAM_NAME -o /dev/null $(dirname $0)/inputs/text1.txt
+    valgrind_code=$?
+    if [[ $valgrind_code = 127 ]]; then
+        echo Valgrind not installed
+    elif [[ $valgrind_code != 0 ]]; then
+        echo Valgrind FAILED with code $valgrind_code
+    fi
 fi
