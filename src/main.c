@@ -7,27 +7,38 @@
 #define LINE_MAX_LENGTH 100
 #define CHUNK_SIZE 10
 
+int compare(char* ptr1, char* ptr2, int num) {
+    if (num) return atoi(ptr1) - atoi(ptr2);
+    else return strcmp(ptr1, ptr2);
+}
 
 void my_qsort(char** left, char** right, int num) {
     int count = (int)(right - left + 1);
     if (count > 1) {
-        char* pivot = &right;
-        char** cur = left;
-        char** nextMin = left;
-        for (; cur <= right; ++cur) {
-            int cursorSmaller = 0;
-            if (num) cursorSmaller = (atoi(&cur) <= atoi(&pivot));
-            else cursorSmaller = (strcmp(&cur, &pivot) <= 0);
+        char* pivot = *left;
+        char** curMin = left+1;
+        char** curMax = right;
 
-            if (cursorSmaller) {
-                char* aux = &nextMin;
-                nextMin[0] = &cur;
-                cur[0] = aux;
-                nextMin += 1;
+        while (curMin <= curMax) {
+            while (curMin <= right && compare(*curMin, pivot, num) <= 0)
+                ++curMin;
+
+            while (curMax >= left && compare(*curMax, pivot, num) > 0)
+                --curMax;
+
+            if (curMin < curMax) {
+                char* aux = *curMin;
+                *curMin = *curMax;
+                *curMax = aux;
             }
         }
-        //my_qsort(left, nextMin-1, num);
-        //my_qsort(nextMin, right, num);
+        
+        char* aux = *left;
+        *left = *curMax;
+        *curMax = aux;
+
+        my_qsort(left, curMax-1, num);
+        my_qsort(curMax+1, right, num);
     }
 }
 

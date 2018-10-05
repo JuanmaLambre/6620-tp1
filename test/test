@@ -24,7 +24,7 @@ function TEST_help() {
 }
 
 function TEST_normal() {
-    ./$PROGRAM_NAME -o - inputs/alice.txt
+    ./$PROGRAM_NAME -o - inputs/easy.txt
     res=$?
     [[ $res = 0 ]] && echo OK || echo FAILED
 }
