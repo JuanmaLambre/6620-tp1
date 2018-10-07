@@ -125,8 +125,10 @@ LOOP:
         lb      t7, 0(t4)
         beqz    t7, END
         subi    t7, t7, 48
-        muli    v0, v0, 10
-        addi    v0,v0,t7
+        li      a3, 10      # muli doesn't wotk...
+        mult    v0, a3
+        mflo    v0
+        addu    v0,v0,t7
         addi    t4, t4, 1
 END:    
         beqz    t3, FIRST_END_ATOI
