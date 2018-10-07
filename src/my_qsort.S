@@ -73,3 +73,65 @@ END:
 
 .... Cerrar stack and stuff ....
 
+
+
+
+
+
+.... myqsort .....
+
+        subu    t0, a1, a0 
+        bltz    t0, EXIT
+        lbu     t0, a0                  # t0: pivot
+        addi    t1, a0, 1               # t1: curmin
+        addi    t2, a1, 0               # t2: curmax
+
+GLOBAL_WHILE:
+        subu    s0,t2,t1                # First while checks for curmin < curmax
+        bltz    s0, END_GLOBAL_WHILE
+
+FIRST_WHILE:
+        subu    s0,a1,t1                # checks for curmin < right
+        bltz    s0, END_FIRST_WHILE
+        #pasarle los args
+        j       COMP_STR
+FIRST_COMP:
+        bgtz    v0, END_FIRST_WHILE        
+        addi    t1,t1,1
+        j       FIRST_WHILE
+END_FIRST_WHILE:
+
+
+SECOND_WHILE:
+        subu    s0,t2,a0                # checks for curm < right
+        bltz    s0, END_SECOND_WHILE
+        #pasarle los args
+        j       COMP_STR
+SECOND_COMP:
+        bltz    v0, END_SECOND_WHILE        
+        subi    t2,t2,1
+        j       SECOND_WHILE
+END_SECOND_WHILE:
+        subu    s0,t1,t2                # checks for curMin < curMax
+        bgez    s0, GLOBAL_WHILE
+        lbu     t3, t1                  # get curmin value
+        lbu     t4, t2                  # get curmax value
+        sb      t4, t1                  # swaps values between curmin and curmax
+        sb      t3, t2
+        j       GLOBAL_WHILE
+
+
+END_GLOBAL_WHILE:
+
+        lbu     t3, a0                  # get left value
+        lbu     t4, t2                  # get curmax value
+        sb      t4, a0                  # swaps values between curmin and curmax
+        sb      t3, t2
+
+RECURSIVE:
+        ... qsort left qspt solo si $t2/4 >= 4 (cuatro o mas elementos) ...
+        ... qsort qspt+4 right idem ...
+
+EXIT:
+        jal ra
+.... end ....
