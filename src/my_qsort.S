@@ -95,7 +95,6 @@ EXIT:
         lw      gp, 24(sp)
         addiu   sp, sp, 40              
         jr      ra
-.... end ....
 
 
 COMP: 
@@ -108,7 +107,6 @@ END_COMP:
 
 
 COMP_STR:
-        ... compare two strings ...
 
 COMP_NUMBER: 
         # Compare numbers
@@ -132,8 +130,6 @@ SECOND_END_ATOI:
  END_COMP_NUMBER:
         j       END_COMP
 
-.... Function ....
-.... Inicializar stack and stuff
 ATOI:
         li      v0, 0       # v0 va a tener el resultado final
 LOOP:
@@ -146,3 +142,5 @@ LOOP:
 END:    
         beqz    t3, FIRST_END_ATOI
         j       t3, SECOND_END_ATOI
+
+.end my_qsort
