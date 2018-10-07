@@ -90,7 +90,7 @@ COMP:
 
 END_COMP:
         beqz    t8, FIRST_COMP
-        j       t8, SECOND_COMP
+        j       SECOND_COMP
 
 
 
@@ -130,6 +130,6 @@ LOOP:
         addi    t4, t4, 1
 END:    
         beqz    t3, FIRST_END_ATOI
-        j       t3, SECOND_END_ATOI
+        j       SECOND_END_ATOI
 
 .end my_qsort
