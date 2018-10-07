@@ -14,7 +14,7 @@ int compare(char* ptr1, char* ptr2, int num) {
 
 void my_qsort(char** left, char** right, int num) {
     int count = (int)(right - left + 1);
-    if (count > 1) {
+    if (left < right) { // Creo que es al pedo usar el count
         char* pivot = *left;
         char** curMin = left+1;
         char** curMax = right;

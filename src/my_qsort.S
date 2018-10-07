@@ -1,4 +1,4 @@
-
+#include <mips/regdef.h>
     .text
     .align 2
     .abicalls
