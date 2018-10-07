@@ -7,18 +7,7 @@
 
 my_qsort:
     #creo StackFrame
-    #       | num caller | 40
-    #        ____
-    #       |   padding  | 36
-    #       |     ra     | 32
-    #       |     fp     | 28
-    #       |     gp     | 24
-    #       |   padding  | 20
-    #       |   LTA PJ   | 16
-    #       |   padding  | 12
-    #       |     izq    | 8
-    #       |     der    | 4
-    #       |     num    | 0
+ 
 
         subu    sp, sp, 40              # Inicializo stack
         sw      ra, 32(sp)
@@ -30,7 +19,7 @@ my_qsort:
 
         subu    t0, a1, a0 
         bltz    t0, EXIT
-        lw      t0, a0                  # t0: pivot
+        lw      t0, 0(a0)               # t0: pivot
         addi    t1, a0, 1               # t1: curmin
         addi    t2, a1, 0               # t2: curmax
 
@@ -41,8 +30,8 @@ GLOBAL_WHILE:
 FIRST_WHILE:
         subu    t4,a1,t1                # checks for curMin <= right
         bltz    t4, END_FIRST_WHILE
-        lw      t4, t1                  # set params to compare them later (curmin and pivot)
-        lw      t5, t0
+        lw      t4, 0(t1)                  # set params to compare them later (curmin and pivot)
+        lw      t5, 0(t0)
         li      t8, 0
         j       COMP_STR
 FIRST_COMP:
@@ -55,13 +44,13 @@ END_FIRST_WHILE:
 SECOND_WHILE:
         subu    t4,t2,a0                # checks for curMax >= left
         bltz    t4, END_SECOND_WHILE
-        lw      t4, t2                  # set params to compare them later (curmax and pivot)
-        lw      t5, t0
+        lw      t4, 0(t2)                  # set params to compare them later (curmax and pivot)
+        lw      t5, 0(t0)
         li      t8, 1
         j       COMP_NUMBER
 SECOND_COMP:
         bltz    v0, END_SECOND_WHILE        
-        subi    t2,t2,4
+        subu    t2,t2,4
         j       SECOND_WHILE
 END_SECOND_WHILE:
         subu    t4,t1,t2                # checks for curMin < curMax
@@ -118,7 +107,7 @@ COMP_NUMBER:
 FIRST_END_ATOI:
         addi    t6, v0, 0     # t6: first int value
         li      t3, 1
-        sw      s3, a0
+        sw      s3, 0(a0)
         addi    t4, t5, 0
         j       ATOI
 SECOND_END_ATOI:        
@@ -133,7 +122,7 @@ SECOND_END_ATOI:
 ATOI:
         li      v0, 0       # v0 va a tener el resultado final
 LOOP:
-        lb      t7, t4
+        lb      t7, 0(t4)
         beqz    t7, END
         subi    t7, t7, 48
         muli    v0, v0, 10
