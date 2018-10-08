@@ -20,7 +20,7 @@ my_qsort:
         subu    t0, a1, a0 
         bltz    t0, EXIT
         lw      t0, 0(a0)               # t0: pivot
-        addi    t1, a0, 1               # t1: curmin
+        addi    t1, a0, 4               # t1: curmin
         addi    t2, a1, 0               # t2: curmax
 
 GLOBAL_WHILE:
@@ -31,7 +31,7 @@ FIRST_WHILE:
         subu    t4,a1,t1                # checks for curMin <= right
         bltz    t4, END_FIRST_WHILE
         lw      t4, 0(t1)                  # set params to compare them later (curmin and pivot)
-        lw      t5, 0(t0)
+        addi    t5, t0, 0
         li      t8, 0
         j       COMP_STR
 FIRST_COMP:
@@ -45,7 +45,7 @@ SECOND_WHILE:
         subu    t4,t2,a0                # checks for curMax >= left
         bltz    t4, END_SECOND_WHILE
         lw      t4, 0(t2)                  # set params to compare them later (curmax and pivot)
-        lw      t5, 0(t0)
+        addi    t5, t0, 0
         li      t8, 1
         j       COMP_NUMBER
 SECOND_COMP:
@@ -71,11 +71,11 @@ END_GLOBAL_WHILE:
 
 RECURSIVE:
         sw      t2, 16(sp)      
-        subi    a1, t2, 1               
+        subi    a1, t2, 4               
         jal     my_qsort                # my_qsort(left, curMax-1, num)
-        lw      a1, 24(sp)              # right
+        lw      a1, 44(sp)              # right
         lw      t2, 16(sp)
-        addiu   a0,t2,1
+        addiu   a0, t2, 4
         jal     my_qsort                # my_qsort(curMax+1, right, num);
 EXIT:
 
@@ -107,14 +107,13 @@ COMP_NUMBER:
 FIRST_END_ATOI:
         addi    t6, v0, 0     # t6: first int value
         li      t3, 1
-        sw      s3, 0(a0)
         addi    t4, t5, 0
         j       ATOI
 SECOND_END_ATOI:        
         addi    t7, v0, 0     # t7: second int value
         subu    t7, t7, t6
         li      v0, -1
-        bgtz    t7, END_COMP_NUMBER
+        bgtz    t7, END_COMP
         li      v0, 1
  END_COMP_NUMBER:
         j       END_COMP
