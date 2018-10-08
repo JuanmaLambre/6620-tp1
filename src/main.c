@@ -63,33 +63,40 @@ void free_lines(char** lines, int count) {
     free(lines);
 }
 
-void process_file(FILE* input, int numeric, FILE* output) {
-    char buffer[LINE_MAX_LENGTH];
+int parse_file(FILE* input, void** dest) {
     char** lines = NULL;
+    char buffer[LINE_MAX_LENGTH];
     int count = 0;
 
-    // Read file line by line
     while (fgets(buffer, LINE_MAX_LENGTH, input)) {
-        if (count >= FILE_MAX_LINES) {
-            // Raise error
-        }
-        if ((count % CHUNK_SIZE) == 0) {
-            int amount = (count/CHUNK_SIZE+1)*CHUNK_SIZE;
-            lines = (char**) realloc(lines, amount*sizeof(void*));
-        }
-        
         int strsize = strlen(buffer);
         if (buffer[strsize-1] == '\n') buffer[strsize-1] = '\0';
-        lines[count] = (char**) malloc(strlen(buffer)+1);
-        strcpy(lines[count], buffer);
+        
+        if (strlen(buffer) > 0) {
+            if ((count % CHUNK_SIZE) == 0) {
+                int amount = (count/CHUNK_SIZE+1)*CHUNK_SIZE;
+                lines = (char**) realloc(lines, amount*sizeof(void*));
+            }
+            
+            lines[count] = (char**) malloc(strlen(buffer)+1);
+            strcpy(lines[count], buffer);
 
-        ++count;
+            ++count;
+        }
     }
+    
+    *dest = lines;
+    return count;
+}
 
-    // Sort the lines
+void process_file(FILE* input, int numeric, FILE* output) {
+    char** lines = NULL;
+    int count = 0;
+    
+    count = parse_file(input, &lines);
+
     my_qsort(lines, &lines[count-1], numeric);
 
-    // Print the lines
     print_output(lines, count, output);
     
     free_lines(lines, count);
@@ -101,6 +108,11 @@ int main(int argc, const char** argv) {
     FILE* input = NULL;
     int numeric = 0;
 
+    if (argc == 1) {
+        fprintf(stderr, "No arguments passed. Use -h option for usage help");
+        return 1;
+    }
+
     for (int i = 1; i < argc; ++i) {
         char* arg = argv[i];
         if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
@@ -110,14 +122,22 @@ int main(int argc, const char** argv) {
             print_version();
             return 0;
         } else if (strcmp(arg, "-o") == 0 || strcmp(arg, "--output") == 0) {
-            if (strcmp(argv[i+1], "-") != 0)
+            if (i == argc - 1) {
+                fprintf(stderr, "No file specified after -o argument");
+                return EINVAL;
+            } else if (strcmp(argv[i+1], "-") != 0) {
                 output = fopen(argv[i+1], "w");
+            }
         } else if (strcmp(arg, "-n") == 0 || strcmp(arg, "--numeric") == 0) {
             numeric = 1;
         }
     }
 
-    input = fopen(argv[argc-1], "r");
+    char* filename = argv[argc-1];
+    input = fopen(filename, "r");
+    if (!input) {
+        fprintf(stderr, "Failed to open file %s, error %d", filename, errno);
+    }
 
     // And we do the processing now
     process_file(input, numeric, output);
