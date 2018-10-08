@@ -52,7 +52,7 @@ void print_version() {
 
 void print_output(char** lines, int count, FILE* output) {
     for (int i = 0; i < count; ++i) {
-        fputs(lines[i], output);
+        fprintf(output, "%s\n", lines[i]);
     }
 }
 
@@ -78,6 +78,8 @@ void process_file(FILE* input, int numeric, FILE* output) {
             lines = (char**) realloc(lines, amount*sizeof(void*));
         }
         
+        int strsize = strlen(buffer);
+        if (buffer[strsize-1] == '\n') buffer[strsize-1] = '\0';
         lines[count] = (char**) malloc(strlen(buffer)+1);
         strcpy(lines[count], buffer);
 

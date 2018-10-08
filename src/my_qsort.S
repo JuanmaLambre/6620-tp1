@@ -18,7 +18,7 @@ my_qsort:
         sw      a2, 48(sp)
 
         subu    t0, a1, a0 
-        bltz    t0, EXIT
+        blez    t0, EXIT
         lw      t0, 0(a0)               # t0: pivot
         addi    t1, a0, 4               # t1: curmin
         addi    t2, a1, 0               # t2: curmax
@@ -40,7 +40,6 @@ FIRST_COMP:
         j       FIRST_WHILE
 END_FIRST_WHILE:
 
-
 SECOND_WHILE:
         subu    t4,t2,a0                # checks for curMax >= left
         bltz    t4, END_SECOND_WHILE
@@ -61,9 +60,7 @@ END_SECOND_WHILE:
         sw      t3, 0(t2)
         j       GLOBAL_WHILE
 
-
 END_GLOBAL_WHILE:
-
         lw     t3, 0(a0)                  # get left value
         lw     t4, 0(t2)                  # get curmax value
         sw     t4, 0(a0)                 # swaps values between left and curmax
@@ -129,6 +126,7 @@ LOOP:
         mflo    v0
         addu    v0,v0,t7
         addi    t4, t4, 1
+        j       LOOP
 END:    
         beqz    t3, FIRST_END_ATOI
         j       SECOND_END_ATOI
