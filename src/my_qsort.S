@@ -24,8 +24,8 @@ my_qsort:
         addi    t2, a1, 0               # t2: curmax
 
 GLOBAL_WHILE:
-        subu    t4,t2,t1                # First while checks for curmin < curmax
-        bltz    t4, END_GLOBAL_WHILE
+        subu    t4,t2,t1                # First while checks for curmin <= curmax
+        bltz   t4, END_GLOBAL_WHILE
 
 FIRST_WHILE:
         subu    t4,a1,t1                # checks for curMin <= right
@@ -33,7 +33,7 @@ FIRST_WHILE:
         lw      t4, 0(t1)                  # set params to compare them later (curmin and pivot)
         addi    t5, t0, 0
         li      t8, 0
-        j       COMP_STR
+        j       COMP
 FIRST_COMP:
         bgtz    v0, END_FIRST_WHILE        
         addi    t1,t1,4
@@ -46,7 +46,7 @@ SECOND_WHILE:
         lw      t4, 0(t2)                  # set params to compare them later (curmax and pivot)
         addi    t5, t0, 0
         li      t8, 1
-        j       COMP_NUMBER
+        j       COMP
 SECOND_COMP:
         bltz    v0, END_SECOND_WHILE        
         subu    t2,t2,4
@@ -68,10 +68,10 @@ END_GLOBAL_WHILE:
 
 RECURSIVE:
         sw      t2, 16(sp)      
-        subi    a1, t2, 4               
+        subu    a1, t2, 4               
         jal     my_qsort                # my_qsort(left, curMax-1, num)
         lw      a1, 44(sp)              # right
-        lw      t2, 16(sp)
+        lw      t2, 16(sp)              # retrieves curmax value
         addiu   a0, t2, 4
         jal     my_qsort                # my_qsort(curMax+1, right, num);
 EXIT:
@@ -84,6 +84,8 @@ EXIT:
 
 
 COMP: 
+        beqz    a2, COMP_STR
+        j       COMP_NUMBER
 
 END_COMP:
         beqz    t8, FIRST_COMP
@@ -93,12 +95,45 @@ END_COMP:
 
 
 COMP_STR:
+        # compare two strings
+        # t4: first element char pointer 
+        # t5: second element char pointer
+        lw      t6,0(t4)    # t6: first element char
+        lw      t7,0(t5)    # t7: second element chat
+        bez     t6,ENDZ_CUR
+        bez     t7,ENDZ_PIVOT
+        slt     t9,t6,t7
+        bgtz    t9,END_SMALLER
+        slt     t9,t7,t6
+        bgtz    t9,END_BIGGER
+        addi    t4,t4,1
+        addi    t5,t5,1
+        j       COMP_STR
+ ENDZ_CUR:
+        bez     t7,END_EQ
+        j       END_BIGGER
+ENDZ_PIVOT:
+        bez     t6,END_EQ
+        j       END_SMALLER
+END_EQ:
+        li      v0,0
+        j       FINISH_COMP
+END_BIGGER:
+        li      v0,-1
+        j       FINISH_COMP
+END_SMALLER:
+        li      v0,1
+FINISH_COMP:
+        j       END_COMP
+
+
+
+
 
 COMP_NUMBER: 
         # Compare numbers
-                                # t4: first element char pointer 
-                                # t5: second element chat pointer
-
+        # t4: first element char pointer 
+        # t5: second element chat pointer
         li      t3, 0
         j       ATOI
 FIRST_END_ATOI:
@@ -120,9 +155,9 @@ ATOI:
 LOOP:
         lb      t7, 0(t4)
         beqz    t7, END
-        subi    t7, t7, 48
-        li      a3, 10      # muli doesn't wotk...
-        mult    v0, a3
+        subu    t7, t7, 48
+        li      a3, 10      
+        mult    v0, a3      # muli doesn't wotk, i had to use mult
         mflo    v0
         addu    v0,v0,t7
         addi    t4, t4, 1
