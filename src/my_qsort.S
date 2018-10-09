@@ -42,7 +42,7 @@ END_FIRST_WHILE:
 
 SECOND_WHILE:
         subu    t4,t2,a0                # checks for curMax >= left
-        bltz    t4, END_SECOND_WHILE
+        blez    t4, END_SECOND_WHILE
         lw      t4, 0(t2)                  # set params to compare them later (curmax and pivot)
         addi    t5, t0, 0
         li      t8, 1
@@ -98,10 +98,10 @@ COMP_STR:
         # compare two strings
         # t4: first element char pointer 
         # t5: second element char pointer
-        lw      t6,0(t4)    # t6: first element char
-        lw      t7,0(t5)    # t7: second element chat
-        bez     t6,ENDZ_CUR
-        bez     t7,ENDZ_PIVOT
+        lb      t6,0(t4)    # t6: first element char
+        lb      t7,0(t5)    # t7: second element chat
+        beq     t6,zero,ENDZ_CUR
+        beq     t7,zero,ENDZ_PIVOT
         slt     t9,t6,t7
         bgtz    t9,END_SMALLER
         slt     t9,t7,t6
@@ -109,20 +109,20 @@ COMP_STR:
         addi    t4,t4,1
         addi    t5,t5,1
         j       COMP_STR
- ENDZ_CUR:
-        bez     t7,END_EQ
-        j       END_BIGGER
-ENDZ_PIVOT:
-        bez     t6,END_EQ
+ENDZ_CUR:
+        beq     t7,zero,END_EQ
         j       END_SMALLER
+ENDZ_PIVOT:
+        beq     t6,zero,END_EQ
+        j       END_BIGGER
 END_EQ:
-        li      v0,0
+        li      v0,1            # yafu, idem a comp_number
         j       FINISH_COMP
 END_BIGGER:
-        li      v0,-1
+        li      v0,1
         j       FINISH_COMP
 END_SMALLER:
-        li      v0,1
+        li      v0,-1
 FINISH_COMP:
         j       END_COMP
 
@@ -147,7 +147,7 @@ SECOND_END_ATOI:
         li      v0, -1
         bgtz    t7, END_COMP
         li      v0, 1
- END_COMP_NUMBER:
+END_COMP_NUMBER:
         j       END_COMP
 
 ATOI:

@@ -1,5 +1,9 @@
 # Trabajo práctico 1
 
+## Cómo compilar el código  
+Para compilar el código con la implementación de `my_qsort` en C, ejecutar `bash build_c`  
+Para compilar con la implementación en ASM, ejecutar `bash build_asm`  
+
 ## Cómo correr los tests  
 Ejecutar `./test/test`. Esto compila automaticamente y corre los tests que estén declarados
 

@@ -3,8 +3,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define FILE_MAX_LINES 256
-#define LINE_MAX_LENGTH 100
 #define CHUNK_SIZE 10
 
 
@@ -74,24 +72,43 @@ void free_lines(char** lines, int count) {
     free(lines);
 }
 
+char* read_line(FILE* input) {
+    char* str = (char*) malloc(sizeof(char));
+    *str = '\0';
+    int len = 0;
+    char c;
+
+    if (feof(input)) return NULL;
+
+    while (EOF != (c=fgetc(input)) && c != '\n') {
+        ++len;
+        str = (char*) realloc(str, sizeof(char)*(len+1));
+        str[len-1] = c;
+        str[len] = '\0';
+    }
+
+    if (c == EOF && len == 0) {
+        free(str);
+        return NULL;
+    }
+
+    return str;
+}
+
 int parse_file(FILE* input, void** dest) {
     char** lines = NULL;
-    char buffer[LINE_MAX_LENGTH];
+    char* line = NULL;
     int count = 0;
 
-    while (fgets(buffer, LINE_MAX_LENGTH, input)) {
-        int strsize = strlen(buffer);
-        if (buffer[strsize-1] == '\n') buffer[strsize-1] = '\0';
+    while (line = read_line(input)) {
+        int length = strlen(line);
         
-        if (strlen(buffer) > 0) {
+        if (length > 0) {
             if ((count % CHUNK_SIZE) == 0) {
                 int amount = (count/CHUNK_SIZE+1)*CHUNK_SIZE;
                 lines = (char**) realloc(lines, amount*sizeof(void*));
             }
-            
-            lines[count] = (char**) malloc(strlen(buffer)+1);
-            strcpy(lines[count], buffer);
-
+            lines[count] = line;
             ++count;
         }
     }
@@ -113,7 +130,7 @@ void process_file(FILE* input, int numeric, FILE* output) {
     free_lines(lines, count);
 }
 
-int parse_args(char** argv, int argc, Arguments* args) {
+int parse_args(char** argv, int argc, Arguments* args, int* error) {
     if (argc == 1) {
         fprintf(stderr, "No arguments passed. Use -h option for usage help\n");
         return 1;
@@ -135,6 +152,7 @@ int parse_args(char** argv, int argc, Arguments* args) {
         } else if (strcmp(arg, "-o") == 0 || strcmp(arg, "--output") == 0) {
             if (i == argc - 1) {
                 fprintf(stderr, "No file specified after -o argument\n");
+                *error = EINVAL;
                 return 1;
             } else if (strcmp(argv[i+1], "-") != 0) {
                 args->output = fopen(argv[i+1], "w");
@@ -148,6 +166,7 @@ int parse_args(char** argv, int argc, Arguments* args) {
     args->input = fopen(filename, "r");
     if (!args->input) {
         fprintf(stderr, "Failed to open file %s, error %d\n", filename, errno);
+        *error = errno;
         return 1;
     }
     
@@ -156,9 +175,10 @@ int parse_args(char** argv, int argc, Arguments* args) {
 
 int main(int argc, const char** argv) {
     Arguments args;
+    int ret = 0;
 
-    int finish = parse_args(argv, argc, &args);
-    if (finish) return 1;
+    int finish = parse_args(argv, argc, &args, &ret);
+    if (finish) return ret;
 
     process_file(args.input, args.numeric, args.output);
     
