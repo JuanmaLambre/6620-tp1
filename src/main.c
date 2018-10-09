@@ -52,11 +52,21 @@ void my_qsort(char** left, char** right, int num) {
 #endif
 
 void print_help() {
-    printf("USAGE HELP");
+    printf("Usage:\n");
+    printf("    qsort -h\n");
+    printf("    qsort -V\n");
+    printf("    qsort [options] archivo\n");
+    printf("Options:\n");
+    printf("    -h, --help      Imprime ayuda.\n");
+    printf("    -V, --version   Versión del programa.\n");
+    printf("    -o, --output    Archivo de salida.\n");
+    printf("    -n, --numeric   Ordenar los datos numéricamente en vez de alfabéticamente.\n");
+    printf("Examples:\n");
+    printf("    qsort -n numeros.txt\n");
 }
 
 void print_version() {
-    printf("Version 1.0");
+    printf("QSort Version 1.0");
 }
 
 void print_output(char** lines, int count, FILE* output) {
@@ -133,6 +143,7 @@ void process_file(FILE* input, int numeric, FILE* output) {
 int parse_args(char** argv, int argc, Arguments* args, int* error) {
     if (argc == 1) {
         fprintf(stderr, "No arguments passed. Use -h option for usage help\n");
+        *error = EINVAL;
         return 1;
     }
 

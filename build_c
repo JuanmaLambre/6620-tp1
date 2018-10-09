@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc -w -std=c99 -o main src/main.c
+gcc -w -std=c99 -o qsort src/main.c

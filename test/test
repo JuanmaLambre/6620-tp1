@@ -6,17 +6,17 @@
 # - Too many lines (*)
 # - Too long string (*)
 # - Empty file
-# - Unexistant file
+# o Unexistant file
 # - Spaces in between (*)
-# - Numeric comparison (--numeric)
-# - Wrong usage of parameters (./main -o for example)
-# - Border cases (exact many lines or exact long string)
-# - No arguments
+# o Numeric comparison (--numeric)
+# o Wrong usage of parameters (./main -o for example)
+# o No arguments
 #
 # (*) Test cases
 
-PROGRAM_NAME='main'
+PROGRAM_NAME='qsort'
 INPUTS_DIR='test/inputs'
+UTILS_DIR='test/utils'
 RUN_VALGRIND=
 
 
@@ -27,8 +27,41 @@ function TEST_help() {
 
 function TEST_normal() {
     exec_program -o - $INPUTS_DIR/easy.txt
-    res=$?
-    [[ $res = 0 ]] && echo OK || echo FAILED $res
+    [[ $? = 0 ]] && echo OK || echo FAILED $?
+}
+
+function TEST_quijote() {
+    ./$PROGRAM_NAME -o - $INPUTS_DIR/quijote.txt 2>/dev/null \
+        | python $UTILS_DIR/check_ordered.py
+    [[ $? = 0 ]] && echo OK || echo FAILED $?
+}
+
+function TEST_numeric() {
+    ./$PROGRAM_NAME -n -o - $INPUTS_DIR/numeros.txt 2>/dev/null \
+        | python $UTILS_DIR/check_ordered.py numeric
+    [[ $? = 0 ]] && echo OK || echo FAILED $?
+}
+
+function TEST_wrong_args() {
+    exec_program -o
+    [[ $? != 0 ]] && echo OK || echo FAILED $?
+}
+
+function TEST_out_equals_in() {
+    cp $INPUTS_DIR/numeros.txt $INPUTS_DIR/numeros.txt.cp
+    #exec_program -o $INPUTS_DIR/numeros.txt.cp
+    [[ $? != 0 ]] && echo OK || echo FAILED $?
+    rm $INPUTS_DIR/numeros.txt.cp
+}
+
+function TEST_no_args() {
+    exec_program
+    [[ $? != 0 ]] && echo OK || echo FAILED $?
+}
+
+function TEST_unexistant_file() {
+    exec_program -o - qjqdjwidwqj
+    [[ $? != 0 ]] && echo OK || echo FAILED $?
 }
 
 
@@ -48,7 +81,7 @@ gcc_code=$?
 success_count=0
 for t in $(declare -F | cut -d' ' -f3 | grep -E '^TEST_'); do
     msg=$($t)
-    echo $t $msg
+    echo $msg $(echo $t | sed 's/_/ /g' | sed 's/TEST //g')
     [[ $(echo -n $msg | grep -oE "OK$") == "OK" ]] && success_count=$((success_count+1))
 done
 echo

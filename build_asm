@@ -2,6 +2,6 @@
 
 gcc -w -c src/my_qsort.S && \
 gcc -w -std=c99 -D ASM_QSORT -c src/main.c && \
-gcc -w my_qsort.o main.o -o main
+gcc -w my_qsort.o main.o -o qsort
 
 rm *.o
