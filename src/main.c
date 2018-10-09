@@ -151,6 +151,7 @@ int parse_args(char** argv, int argc, Arguments* args, int* error) {
     args->output = stdout;
     args->input = NULL;
     args->numeric = 0;
+    char* output_name = NULL, *input_name = NULL;
 
     for (int i = 1; i < argc; ++i) {
         char* arg = argv[i];
@@ -166,17 +167,24 @@ int parse_args(char** argv, int argc, Arguments* args, int* error) {
                 *error = EINVAL;
                 return 1;
             } else if (strcmp(argv[i+1], "-") != 0) {
-                args->output = fopen(argv[i+1], "w");
+                output_name = argv[i+1];
+                args->output = fopen(output_name, "w");
             }
         } else if (strcmp(arg, "-n") == 0 || strcmp(arg, "--numeric") == 0) {
             args->numeric = 1;
         }
     }
     
-    char* filename = argv[argc-1];
-    args->input = fopen(filename, "r");
+    input_name = argv[argc-1];
+    if (input_name == output_name) {
+        fprintf(stderr, "No input specified\n");
+        *error = EINVAL;
+        return 1;
+    }
+
+    args->input = fopen(input_name, "r");
     if (!args->input) {
-        fprintf(stderr, "Failed to open file %s, error %d\n", filename, errno);
+        fprintf(stderr, "Failed to open file %s, error %d\n", input_name, errno);
         *error = errno;
         return 1;
     }
