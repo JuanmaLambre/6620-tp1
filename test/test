@@ -17,7 +17,6 @@
 PROGRAM_NAME='qsort'
 INPUTS_DIR='test/inputs'
 UTILS_DIR='test/utils'
-RUN_VALGRIND=
 
 
 function TEST_help() {
@@ -90,7 +89,7 @@ count=$(declare -F | cut -d' ' -f3 | grep -E '^TEST_' | wc -l)
 echo Success $((100*success_count/count))'%'
 echo
 
-if [[ ! -z $RUN_VALGRIND ]]; then
+if [[ $RUN_VALGRIND = "y" ]]; then
     echo Running with valgrind...
     valgrind ./$PROGRAM_NAME -o /dev/null $(dirname $0)/inputs/text1.txt
     valgrind_code=$?

@@ -66,7 +66,7 @@ void print_help() {
 }
 
 void print_version() {
-    printf("QSort Version 1.0");
+    printf("QSort Version 1.0\n");
 }
 
 void print_output(char** lines, int count, FILE* output) {
