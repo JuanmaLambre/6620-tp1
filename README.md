@@ -1,5 +1,5 @@
 # 6620 Organización de Computadoras - TP 1  
-1C2018
+2C2018
 
 ## Cómo compilar el código  
 Para compilar el código con la implementación de `my_qsort` en C, ejecutar `bash build_c`  
